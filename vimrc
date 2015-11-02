@@ -1,7 +1,19 @@
 " Pathogen
 execute pathogen#infect()
-syntax on
-filetype plugin indent on
+
+" 1 tab to 2 space for ruby
+" set tabstop=2
+" set softtabstop=2
+" set shiftwidth=2
+" set expandtab
+" Softtabs, 2 spaces
+" set tabstop=2
+" set shiftwidth=2
+" set shiftround
+" set expandtab
+
+" comma for leader key
+let mapleader=","
 
 " Solarized
 syntax enable
@@ -11,30 +23,6 @@ colorscheme solarized
 " CTRL P Settings
 let g:ctrlp_map = '<c-p>'
 let g:ctrlp_cmd = 'CtrlP'
-
-" vimclojure
-let vimclojure#WantNailgun = 1
-
-" tab spacing
-set tabstop=4
-set ts=4
-set shiftwidth=4
-set autoindent
-
-" Whitespace stripping
-function! <SID>StripTrailingWhitespaces()
-    " Preparation: save last search, and cursor position.
-    let _s=@/
-    let l = line(".")
-    let c = col(".")
-    " Do the business:
-    %s/\s\+$//e
-    " Clean up: restore previous search history, and cursor position
-    let @/=_s
-    call cursor(l, c)
-endfunction
-
-autocmd BufWritePre * :call <SID>StripTrailingWhitespaces()
 
 " Rainbow Paranthesis
 au VimEnter * RainbowParenthesesToggle
@@ -48,18 +36,17 @@ if $TERM_PROGRAM =~ "iTerm"
     let &t_EI = "\<Esc>]50;CursorShape=0\x7" " Block in normal mode
 endif
 
-" Soft word wrap
- command! -nargs=* Wrap set wrap linebreak nolist
-
 "Nerdtree
 map <C-n> :NERDTreeToggle<CR>
+
+" Don’t add empty newlines at the end of files
+set binary
+set noeol
 
 " Use 14pt Monaco
 set guifont=Monaco:h14
 " Don’t blink cursor in normal mode
 set guicursor=n:blinkon0
-" Better line-height
-" set linespace=8
 
 " Make Vim more useful
 set nocompatible
@@ -67,9 +54,15 @@ set nocompatible
 set ttyfast
 " Use UTF-8 without BOM
 set encoding=utf-8 nobomb
+
 " Don’t add empty newlines at the end of files
 set binary
 set noeol
+
+" Show “invisible” characters
+set lcs=tab:▸\ ,trail:·,eol:¬,nbsp:_
+set list
+
 " Highlight current line
 set cursorline
 :hi CursorLine term=bold cterm=bold guibg=darkred guifg=white
@@ -99,4 +92,23 @@ set showcmd
 " Allow backspace in insert mode
 set backspace=indent,eol,start
 
+" Use Mouse
+:set mouse=a
 
+" Copy current file path to clipboard
+:command! CP let @+ = expand('%:p')
+
+" Create newline outside of insert mode using Shift + Enter
+nmap <S-Enter> O<Esc>
+nmap <CR> o<Esc>
+
+" Old regex for Ruby (fixes lag when using UsersSystem)
+set re=1
+
+" alt ruby plugin
+nnoremap <leader>at :AlternateToggle<cr>
+nnoremap <leader>av :AlternateVerticalSplit<cr>
+nnoremap <leader>as :AlternateHorizontalSplit<cr>
+
+filetype plugin indent on     " required!
+syntax on
