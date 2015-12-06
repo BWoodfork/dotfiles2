@@ -1,114 +1,140 @@
-" Pathogen
+"Init function for pathogen"
 execute pathogen#infect()
 
-" 1 tab to 2 space for ruby
-" set tabstop=2
-" set softtabstop=2
-" set shiftwidth=2
-" set expandtab
-" Softtabs, 2 spaces
-" set tabstop=2
-" set shiftwidth=2
-" set shiftround
-" set expandtab
+"dont wrap lines
+set nowrap
 
-" comma for leader key
-let mapleader=","
+"enable mouse mode
+set mouse=a
 
-" Solarized
+"Default to system clipboard
+set clipboard=unnamed
+
+"Display cljx files as clojure files
+au BufNewFile,BufRead *.cljx set filetype=clojure
+
+"Python settings
+autocmd Filetype python setlocal expandtab tabstop=4 shiftwidth=4
+
+"No Esc key
+"inoremap <Esc> <NOP>
+
+"Search while typing
+:set incsearch
+
+"Eclim
+set nocompatible
+
+"CtrlP max height"
+let g:ctrlp_max_height = 50
+
+syntax enable
+
+"Color scheme"
 syntax enable
 set background=dark
 colorscheme solarized
 
-" CTRL P Settings
-let g:ctrlp_map = '<c-p>'
-let g:ctrlp_cmd = 'CtrlP'
+"Change leader key"
+let mapleader=","
 
-" Rainbow Paranthesis
-au VimEnter * RainbowParenthesesToggle
-au Syntax * RainbowParenthesesLoadRound
-au Syntax * RainbowParenthesesLoadSquare
-au Syntax * RainbowParenthesesLoadBraces
+"Eval clojure expressions with fireplace.vim"
+map <leader>E :%Eval<cr>
+map <leader>e :Eval<cr>
+"Requres clojure.tools.namespace dependency in the project.clj
+" map <leader>R :Eval (require '[clojure.tools.namespace.repl]) (clojure.tools.namespace.repl/refresh)<cr>
+map <leader>t :RunTests<cr>
 
-" Change cursor shape between insert and normal mode in iTerm2.app
-if $TERM_PROGRAM =~ "iTerm"
-    let &t_SI = "\<Esc>]50;CursorShape=1\x7" " Vertical bar in insert mode
-    let &t_EI = "\<Esc>]50;CursorShape=0\x7" " Block in normal mode
-endif
+let g:ctrlp_extensions = ['funky']
+let g:ctrlp_funky_syntax_highlight = 1
+map <leader>f :CtrlPFunky<cr>
 
-"Nerdtree
-map <C-n> :NERDTreeToggle<CR>
-
-" Don’t add empty newlines at the end of files
-set binary
-set noeol
-
-" Use 14pt Monaco
-set guifont=Monaco:h14
-" Don’t blink cursor in normal mode
-set guicursor=n:blinkon0
-
-" Make Vim more useful
-set nocompatible
-" Optimize for fast terminal connections
-set ttyfast
-" Use UTF-8 without BOM
-set encoding=utf-8 nobomb
-
-" Don’t add empty newlines at the end of files
-set binary
-set noeol
-
-" Show “invisible” characters
-set lcs=tab:▸\ ,trail:·,eol:¬,nbsp:_
-set list
-
-" Highlight current line
-set cursorline
-:hi CursorLine term=bold cterm=bold guibg=darkred guifg=white
-
-" Ignore case of searches
-set ignorecase
-" Always show status line
-set laststatus=2
-" Disable error bells
-set noerrorbells
-" Don’t reset cursor to start of line when moving around.
-set nostartofline
-" Show the cursor position
-set ruler
-" Don’t show the intro message when starting Vim
-set shortmess=atI
-" Show the current mode
-set showmode
-" Show the filename in the window titlebar
-set title
-" Show the (partial) command as it’s being typed
-set showcmd
-
-" Soft line word wrap
-:set wrap linebreak nolist
-
-" Allow backspace in insert mode
+""
 set backspace=indent,eol,start
 
-" Use Mouse
-:set mouse=a
+""
+filetype plugin indent on
+
+"Show line numbers"
+
+set number
+""
+set expandtab
+set tabstop=2
+set shiftwidth=2
+set autoindent
+set smartindent
+"Turn highlighting for search results on""
+set hlsearch
+
+"Highlight searches and unhighlight them with return"
+:nnoremap <CR> :nohlsearch<cr>
+
+set wildmode=longest,list
+set wildmenu
+
+"Always show status bar"
+set laststatus=2
+"Show coordinates in lower right corner"
+set ruler
+
+"Ignore compiled java files in ctrlp"
+let g:ctrlp_custom_ignore = '.class$'
+
+"Run the current file with ruby -- mainly for Minitest"
+map <leader>m :w\|:!clear; ruby %:p<cr>
+
+"Open/Close NERDTree"
+map <leader>n :NERDTreeToggle<cr>
+
+"Set NERDTree width"
+" let g:NERDTreeWinSize = 45
+
+"Jump to last cursor position unless it's invalid or in an event handler"
+autocmd BufReadPost *
+  \ if line("'\"") > 0 && line("'\"") <= line("$") |
+  \   exe "normal g'\"" |
+  \ endif
+
+"Multipurpose Tab Key -- indent if at the beginning of a line, else do completion
+function! InsertTabWrapper()
+  let col = col('.') - 1
+  if !col || getline('.')[col - 1] !~ '\k'
+    return "\<tab>"
+  else
+    return "\<c-p>"
+  endif
+endfunction
+inoremap <tab> <c-r>=InsertTabWrapper()<cr>
+inoremap <s-tab> <c-n>
+
+"Quit NERDTree if it is the last open buffer"
+autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType == "primary") | q | endif
+
+" highlight too-long lines
+autocmd BufRead,InsertEnter,InsertLeave * 2match LineLengthError /\%128v.*/
+highlight LineLengthError ctermbg=black guibg=black
+autocmd ColorScheme * highlight LineLengthError ctermbg=black guibg=black
+
+let g:gitgutter_sign_column_always = 1
+
+function! OpenAlternateRubyFileInVerticalSplit()
+  :let l:spec=system("alternate_file " . expand("%:p"))
+  if l:spec != "__FAIL__"
+    execute "vs " . l:spec
+  endif
+endfunction
 
 " Copy current file path to clipboard
 :command! CP let @+ = expand('%:p')
 
-" Create newline outside of insert mode using Shift + Enter
-nmap <S-Enter> O<Esc>
-nmap <CR> o<Esc>
-
-" Old regex for Ruby (fixes lag when using UsersSystem)
-set re=1
-
-" alt ruby plugin
+" Alt Ruby
 nnoremap <leader>at :AlternateToggle<cr>
 nnoremap <leader>av :AlternateVerticalSplit<cr>
 nnoremap <leader>as :AlternateHorizontalSplit<cr>
 
-filetype plugin indent on     " required!
-syntax on
+" Run rspec tests
+map <leader>r :!clear && rspec %:p<cr>
+
+" Search case insensitive
+:set ignorecase
