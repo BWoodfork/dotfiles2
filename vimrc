@@ -138,3 +138,7 @@ map <leader>r :!clear && rspec %:p<cr>
 
 " Search case insensitive
 :set ignorecase
+
+" vim jsx
+" indent .js files as well as .jsx files
+let g:jsx_ext_required = 0
