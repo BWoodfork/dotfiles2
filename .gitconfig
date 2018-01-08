@@ -1,0 +1,27 @@
+[alias]
+    st = status
+    ci = commit
+    co = checkout
+    br = branch
+    unstage = reset HEAD --
+    last = log -1 HEAD
+    aa = add -A
+    dr = push origin --delete #pass the branch name as an arg
+  rename = branch -m
+[user]
+	name = bwoodfork
+	email = bwoodfork@8thlight.com
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+
+[core]
+	pager = less -FXRS -x5
+	excludesfile = /Users/byronwoodfork/.gitignore
+[credential]
+	helper = osxkeychain
+
+ ; git branch --merged | grep -v '\*\|master\|develop' | xargs -n 1 git branch -d
+
